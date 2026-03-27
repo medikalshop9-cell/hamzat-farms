@@ -80,7 +80,7 @@ export default function About() {
           >
             <div className="rounded-2xl overflow-hidden aspect-[4/3]">
               <img
-                src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80"
+                src="/assets/farm-photo.jpg"
                 alt="Chickens at Hamzat Farms, Kokobiriko Ashanti"
                 className="w-full h-full object-cover"
                 style={{ transition: "transform 0.6s cubic-bezier(0.16,1,0.3,1)" }}
