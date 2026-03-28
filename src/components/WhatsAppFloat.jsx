@@ -7,7 +7,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with Hamzat Farms on WhatsApp"
-      className="wa-float"
+      className="wa-float hidden md:block"
     >
       <div className="wa-float-btn">
         <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
