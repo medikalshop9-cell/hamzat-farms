@@ -9,17 +9,34 @@ export default function BookVisit() {
     visitors: "1",
   });
   const [sent, setSent] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
 
-  const handleSubmit = () => {
-    if (!form.name || !form.phone || !form.date) {
-      alert("Please fill in your name, phone, and preferred date.");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const nextErrors = {};
+
+    if (!form.name.trim()) nextErrors.name = "Please enter your name.";
+    if (!form.phone.trim()) nextErrors.phone = "Please enter your phone number.";
+    if (!form.date) nextErrors.date = "Please choose a preferred date.";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
       return;
     }
+
     const msg = buildBookingMessage(form);
-    window.open(`${WHATSAPP_BASE}?text=${msg}`, "_blank");
+    window.open(`${WHATSAPP_BASE}?text=${msg}`, "_blank", "noopener,noreferrer");
     setSent(true);
   };
 
@@ -81,7 +98,7 @@ export default function BookVisit() {
             </h3>
 
             {sent ? (
-              <div className="text-center py-10">
+              <div className="text-center py-10" role="status" aria-live="polite">
                 <p className="text-4xl mb-3">✅</p>
                 <p className="font-semibold text-brand-dark text-lg">
                   Your booking was sent on WhatsApp!
@@ -90,55 +107,89 @@ export default function BookVisit() {
                   We will confirm your visit shortly.
                 </p>
                 <button
-                  onClick={() => setSent(false)}
+                  onClick={() => {
+                    setSent(false);
+                    setErrors({});
+                  }}
                   className="mt-6 text-brand-green font-semibold text-sm hover:underline"
                 >
                   Book another visit
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit} noValidate>
                 <div>
-                  <label className="block text-sm font-semibold text-brand-dark mb-1.5">
+                  <label htmlFor="visit-name" className="block text-sm font-semibold text-brand-dark mb-1.5">
                     Your Name *
                   </label>
                   <input
+                    id="visit-name"
                     name="name"
                     value={form.name}
                     onChange={handleChange}
                     placeholder="e.g. Kofi Mensah"
+                    autoComplete="name"
+                    required
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? "visit-name-error" : undefined}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
                   />
+                  {errors.name && (
+                    <p id="visit-name-error" className="text-xs text-brand-red mt-1.5" role="alert">
+                      {errors.name}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brand-dark mb-1.5">
+                  <label htmlFor="visit-phone" className="block text-sm font-semibold text-brand-dark mb-1.5">
                     Phone Number *
                   </label>
                   <input
+                    id="visit-phone"
                     name="phone"
+                    type="tel"
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="e.g. +233 24 000 0000"
+                    autoComplete="tel"
+                    required
+                    aria-invalid={Boolean(errors.phone)}
+                    aria-describedby={errors.phone ? "visit-phone-error" : undefined}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
                   />
+                  {errors.phone && (
+                    <p id="visit-phone-error" className="text-xs text-brand-red mt-1.5" role="alert">
+                      {errors.phone}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brand-dark mb-1.5">
+                  <label htmlFor="visit-date" className="block text-sm font-semibold text-brand-dark mb-1.5">
                     Preferred Date *
                   </label>
                   <input
+                    id="visit-date"
                     name="date"
                     type="date"
                     value={form.date}
                     onChange={handleChange}
+                    required
+                    aria-invalid={Boolean(errors.date)}
+                    aria-describedby={errors.date ? "visit-date-error" : undefined}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
                   />
+                  {errors.date && (
+                    <p id="visit-date-error" className="text-xs text-brand-red mt-1.5" role="alert">
+                      {errors.date}
+                    </p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brand-dark mb-1.5">
+                  <label htmlFor="visit-visitors" className="block text-sm font-semibold text-brand-dark mb-1.5">
                     Number of Visitors
                   </label>
                   <select
+                    id="visit-visitors"
                     name="visitors"
                     value={form.visitors}
                     onChange={handleChange}
@@ -153,7 +204,7 @@ export default function BookVisit() {
                 </div>
 
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   className="w-full btn-whatsapp justify-center mt-2"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -167,7 +218,7 @@ export default function BookVisit() {
                   Tapping the button opens WhatsApp with your details pre-filled.
                   We confirm your booking from there.
                 </p>
-              </div>
+              </form>
             )}
           </div>
         </div>

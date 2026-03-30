@@ -16,8 +16,14 @@ export default function Ribbons({
   const rafRef       = useRef(null);
 
   useEffect(() => {
-    let Renderer, Camera, Transform, Program, Mesh, Triangle;
-    let renderer, gl, camera, scene, program, mesh;
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    let Renderer, Camera, Transform, Program;
+    let renderer, gl, camera, scene, program;
     let mouse      = { x: 0, y: 0 };
     let points     = [];
     let frameCount = 0;
@@ -26,7 +32,7 @@ export default function Ribbons({
     async function init() {
       try {
         const OGL = await import("ogl");
-        ({ Renderer, Camera, Transform, Program, Mesh, Triangle } = OGL);
+        ({ Renderer, Camera, Transform, Program } = OGL);
 
         const container = containerRef.current;
         if (!container) return;
@@ -149,6 +155,7 @@ export default function Ribbons({
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
+      containerRef.current?.removeEventListener("mousemove", onMouseMove);
       if (gl?.canvas?.parentNode) gl.canvas.parentNode.removeChild(gl.canvas);
     };
   }, []);

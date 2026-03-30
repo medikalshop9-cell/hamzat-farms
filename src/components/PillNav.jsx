@@ -150,6 +150,8 @@ export default function PillNav() {
             className="md:hidden text-white p-2 z-10"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
             <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
             <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
@@ -159,6 +161,8 @@ export default function PillNav() {
 
         {/* Mobile menu */}
         <div
+          id="mobile-menu"
+          aria-hidden={!menuOpen}
           className={`md:hidden transition-all duration-400 overflow-hidden ${
             menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
@@ -173,6 +177,7 @@ export default function PillNav() {
                 duration={700}
                 offset={-70}
                 onClick={() => { setActive(i); setMenuOpen(false); }}
+                tabIndex={menuOpen ? 0 : -1}
                 className="text-white font-semibold py-2 px-4 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
               >
                 {item.label}
@@ -183,6 +188,7 @@ export default function PillNav() {
               target="_blank"
               rel="noopener noreferrer"
               className="btn-whatsapp w-fit mt-2 text-sm"
+              tabIndex={menuOpen ? 0 : -1}
               onClick={() => setMenuOpen(false)}
             >
               Order Now

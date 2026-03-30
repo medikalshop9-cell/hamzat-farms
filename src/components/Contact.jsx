@@ -40,15 +40,32 @@ const CONTACT_ITEMS = [
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", phone: "", message: "" });
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errors, setErrors] = useState({});
 
-  const handleChange = (e) =>
-    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((p) => ({ ...p, [name]: value }));
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
 
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.message) {
-      alert("Please fill in your name and message.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const nextErrors = {};
+
+    if (!formData.name.trim()) nextErrors.name = "Please enter your name.";
+    if (!formData.message.trim()) nextErrors.message = "Please enter your message.";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      setStatus("idle");
       return;
     }
+
     setStatus("sending");
     try {
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
@@ -149,7 +166,7 @@ export default function Contact() {
             </h3>
 
             {status === "success" ? (
-              <div className="text-center py-10">
+              <div className="text-center py-10" role="status" aria-live="polite">
                 <p className="text-4xl mb-3">✅</p>
                 <p className="font-semibold text-brand-dark">Message sent!</p>
                 <p className="text-brand-muted text-sm mt-2">
@@ -157,38 +174,77 @@ export default function Contact() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Your Name *"
-                  className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
-                />
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Your Phone Number"
-                  className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
-                />
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Your message... *"
-                  rows={5}
-                  className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors resize-none"
-                />
+              <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+                <div>
+                  <label htmlFor="contact-name" className="sr-only">
+                    Your Name
+                  </label>
+                  <input
+                    id="contact-name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Your Name *"
+                    autoComplete="name"
+                    required
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? "contact-name-error" : undefined}
+                    className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
+                  />
+                  {errors.name && (
+                    <p id="contact-name-error" className="text-xs text-brand-red mt-1.5" role="alert">
+                      {errors.name}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="contact-phone" className="sr-only">
+                    Your Phone Number
+                  </label>
+                  <input
+                    id="contact-phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Your Phone Number"
+                    autoComplete="tel"
+                    className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="contact-message" className="sr-only">
+                    Your message
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Your message... *"
+                    rows={5}
+                    required
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? "contact-message-error" : undefined}
+                    className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green transition-colors resize-none"
+                  />
+                  {errors.message && (
+                    <p id="contact-message-error" className="text-xs text-brand-red mt-1.5" role="alert">
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
 
                 {status === "error" && (
-                  <p className="text-brand-red text-xs">
+                  <p className="text-brand-red text-xs" role="alert" aria-live="polite">
                     Something went wrong. Please try WhatsApp instead.
                   </p>
                 )}
 
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   disabled={status === "sending"}
                   className="btn-primary w-full justify-center disabled:opacity-60"
                 >
@@ -206,7 +262,7 @@ export default function Contact() {
                     WhatsApp
                   </a>
                 </p>
-              </div>
+              </form>
             )}
           </div>
         </div>
