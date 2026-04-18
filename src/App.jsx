@@ -1,5 +1,6 @@
 import PillNav    from "./components/PillNav";
 import Hero       from "./components/Hero";
+import PartnerLogoLoop from "./components/PartnerLogoLoop";
 import About      from "./components/About";
 import Products   from "./components/Products";
 import BookVisit  from "./components/BookVisit";
@@ -17,6 +18,7 @@ export default function App() {
       <PillNav />
       <main>
         <Hero />
+        <PartnerLogoLoop />
         <About />
         <Products />
         <BookVisit />
