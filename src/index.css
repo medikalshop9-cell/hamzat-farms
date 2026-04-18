@@ -179,6 +179,10 @@
   100% { transform: scale(1.7); opacity: 0;   }
 }
 
+@media (max-width: 767px) {
+  .wa-float { display: none !important; }
+}
+
 /* ─── STAT COUNTER ANIMATION ────────────────────────────────────────────────── */
 @keyframes countUp {
   from { opacity: 0; transform: translateY(16px); }

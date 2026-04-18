@@ -75,7 +75,7 @@ const ITEMS = [
   },
 ];
 
-export default function Dock({ baseItemSize = 40, magnification = 54, panelHeight = 64 }) {
+export default function Dock({ baseItemSize = 36, magnification = 48, panelHeight = 60 }) {
   const mouseX = useMotionValue(Infinity);
 
   return (
@@ -99,8 +99,8 @@ export default function Dock({ baseItemSize = 40, magnification = 54, panelHeigh
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 8,
-          padding: "0 14px",
+          gap: 6,
+          padding: "0 10px",
           background: "rgba(26,26,26,0.82)",
           backdropFilter: "blur(20px)",
           borderRadius: 9999,
